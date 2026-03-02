@@ -1,0 +1,66 @@
+# Claw Customer Service - Environment Configuration
+
+# Server Configuration
+PORT=3000
+NODE_ENV=production
+
+# Google OAuth & APIs
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URL=http://localhost:3000/auth/callback
+GOOGLE_OAUTH_TOKEN={"access_token":"...","refresh_token":"..."}
+
+# Google Sheets (Knowledge Base)
+GOOGLE_SHEET_ID=your_google_sheet_id
+
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+
+# LLM Configuration - Primary Provider
+LLM_PRIMARY_PROVIDER=ollama
+LLM_PRIMARY_MODEL=llama2
+LLM_PRIMARY_BASE_URL=http://localhost:11434
+
+# LLM Configuration - Fallback Provider (optional)
+# Use OpenAI as fallback
+LLM_FALLBACK_PROVIDER=openai
+LLM_FALLBACK_MODEL=gpt-3.5-turbo
+LLM_FALLBACK_API_KEY=sk-...
+
+# Alternative: Use Claude as fallback
+# LLM_FALLBACK_PROVIDER=claude
+# LLM_FALLBACK_MODEL=claude-3-sonnet-20240229
+# LLM_FALLBACK_API_KEY=sk-ant-...
+
+# Database
+CLAW_DATA_DIR=./data
+DATABASE_URL=sqlite:./data/claw-learning.db
+
+# Feature Flags
+ENABLE_EMAIL=true
+ENABLE_PHONE=true
+ENABLE_LEARNING=true
+
+# Rate Limiting
+MAX_DAILY_CALLS=100
+MAX_DAILY_EMAILS=500
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW_MS=60000
+
+# Logging
+LOG_LEVEL=info
+LOG_FORMAT=json
+
+# Security
+PROMPT_INJECTION_PROTECTION=true
+AUDIT_LOGGING=true
+ENCRYPTION_KEY=your_encryption_key_here
+
+# Response Configuration
+DEFAULT_RESPONSE_TONE=professional
+# Options: professional, friendly, technical
+
+# Retention Policy
+DATA_RETENTION_DAYS=90

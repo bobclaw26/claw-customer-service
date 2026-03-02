@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Claw Customer Service Application
+  claw:
+    build:
+      context: .
+      dockerfile: CLAW-DOCKERFILE
+    container_name: claw-customer-service
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      # Server
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-production}
+      
+      # Google OAuth & APIs
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL}
+      GOOGLE_OAUTH_TOKEN: ${GOOGLE_OAUTH_TOKEN}
+      GOOGLE_SHEET_ID: ${GOOGLE_SHEET_ID}
+      
+      # Twilio
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+      
+      # LLM - Primary (Ollama)
+      LLM_PRIMARY_PROVIDER: ${LLM_PRIMARY_PROVIDER:-ollama}
+      LLM_PRIMARY_MODEL: ${LLM_PRIMARY_MODEL:-llama2}
+      LLM_PRIMARY_BASE_URL: ${LLM_PRIMARY_BASE_URL:-http://ollama:11434}
+      
+      # LLM - Fallback (OpenAI or Claude)
+      LLM_FALLBACK_PROVIDER: ${LLM_FALLBACK_PROVIDER}
+      LLM_FALLBACK_MODEL: ${LLM_FALLBACK_MODEL}
+      LLM_FALLBACK_API_KEY: ${LLM_FALLBACK_API_KEY}
+      
+      # Database
+      CLAW_DATA_DIR: /app/data
+      
+      # Features
+      ENABLE_EMAIL: ${ENABLE_EMAIL:-true}
+      ENABLE_PHONE: ${ENABLE_PHONE:-true}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      
+    volumes:
+      - claw-data:/app/data
+    depends_on:
+      - ollama
+    networks:
+      - claw-network
+    restart: unless-stopped
+
+  # Ollama - Local LLM (optional but recommended)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: claw-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: 4
+      OLLAMA_NUM_THREAD: 8
+    networks:
+      - claw-network
+    restart: unless-stopped
+    # Optional: Pull model on startup
+    entrypoint: /bin/sh -c "ollama serve & sleep 5 && ollama pull llama2; wait"
+
+volumes:
+  claw-data:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  claw-network:
+    driver: bridge
+
+# Quick start guide:
+# 1. Copy .env.example to .env
+# 2. Fill in required variables (Google OAuth, Twilio, etc)
+# 3. Run: docker-compose up
+# 4. Access at: http://localhost:3000/health
+#
+# Optional: If you want to skip Ollama (use cloud LLM only):
+# docker-compose up claw
+#
+# To rebuild after code changes:
+# docker-compose build --no-cache
+# docker-compose up
